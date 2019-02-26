@@ -15,8 +15,8 @@
 package monitoredresource
 
 import (
-	"github.com/aws/aws-sdk-go/aws/ec2metadata"
-	"github.com/aws/aws-sdk-go/aws/session"
+	"github.com/aws/aws-sdk-go-v2/aws/ec2metadata"
+	"github.com/aws/aws-sdk-go-v2/aws/external"
 )
 
 // awsIdentityDocument is used to store parsed AWS Identity Document.
@@ -37,7 +37,11 @@ type awsIdentityDocument struct {
 // This is only done once.
 func retrieveAWSIdentityDocument() *awsIdentityDocument {
 	awsIdentityDoc := awsIdentityDocument{}
-	c := ec2metadata.New(session.New())
+	config, err := external.LoadDefaultAWSConfig()
+	if err != nil {
+		return nil
+	}
+	c := ec2metadata.New(config)
 	if c.Available() == false {
 		return nil
 	}
